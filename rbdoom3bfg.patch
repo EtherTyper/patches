@@ -1,12 +1,12 @@
-From 4ebc6f89f04cf70eaf9e848d1f4ebb3c00d52d6b Mon Sep 17 00:00:00 2001
+From 6967cdc016dfe2a33058a4b4b5242fd12e65bd2a Mon Sep 17 00:00:00 2001
 From: Eli Bradley <elibradley@utexas.edu>
-Date: Thu, 21 Oct 2021 16:45:32 -0500
-Subject: [PATCH] macOS temp fix
+Date: Thu, 21 Oct 2021 18:40:01 -0500
+Subject: [PATCH] Real fix moment
 
 ---
- .gitignore                          |  2 ++
- neo/sound/OpenAL/AL_SoundSample.cpp | 16 ++++++++--------
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ .gitignore         | 2 ++
+ neo/CMakeLists.txt | 6 +++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/.gitignore b/.gitignore
 index bebbac75..5abe494a 100644
@@ -18,79 +18,30 @@ index bebbac75..5abe494a 100644
  neo/cmake-build-*/
 +
 +.DS_Store
-diff --git a/neo/sound/OpenAL/AL_SoundSample.cpp b/neo/sound/OpenAL/AL_SoundSample.cpp
-index 369cbf08..0e469468 100644
---- a/neo/sound/OpenAL/AL_SoundSample.cpp
-+++ b/neo/sound/OpenAL/AL_SoundSample.cpp
-@@ -285,7 +285,7 @@ void idSoundSample_OpenAL::CreateOpenALBuffer()
+diff --git a/neo/CMakeLists.txt b/neo/CMakeLists.txt
+index 98de8c0f..f292f5ef 100644
+--- a/neo/CMakeLists.txt
++++ b/neo/CMakeLists.txt
+@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.2)
  
- 	if( CheckALErrors() != AL_NO_ERROR )
- 	{
--		common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: error generating OpenAL hardware buffer" );
-+		// common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: error generating OpenAL hardware buffer" );
- 	}
+ project(RBDoom3BFG)
  
- 	if( alIsBuffer( openalBuffer ) )
-@@ -304,7 +304,7 @@ void idSoundSample_OpenAL::CreateOpenALBuffer()
- 
- 			if( MS_ADPCM_decode( ( uint8** ) &buffer, &bufferSize ) < 0 )
- 			{
--				common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: could not decode ADPCM '%s' to 16 bit format", GetName() );
-+				// common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: could not decode ADPCM '%s' to 16 bit format", GetName() );
- 			}
- 
- 			buffers[0].buffer = buffer;
-@@ -315,12 +315,12 @@ void idSoundSample_OpenAL::CreateOpenALBuffer()
- 		else if( format.basic.formatTag == idWaveFile::FORMAT_XMA2 )
- 		{
- 			// RB: not used in the PC version of the BFG edition
--			common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: could not decode XMA2 '%s' to 16 bit format", GetName() );
-+			// common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: could not decode XMA2 '%s' to 16 bit format", GetName() );
- 		}
- 		else if( format.basic.formatTag == idWaveFile::FORMAT_EXTENSIBLE )
- 		{
- 			// RB: not used in the PC version of the BFG edition
--			common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: could not decode extensible WAV format '%s' to 16 bit format", GetName() );
-+			// common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: could not decode extensible WAV format '%s' to 16 bit format", GetName() );
- 		}
- 		else
- 		{
-@@ -355,7 +355,7 @@ void idSoundSample_OpenAL::CreateOpenALBuffer()
- 
- 		if( CheckALErrors() != AL_NO_ERROR )
- 		{
--			common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: error loading data into OpenAL hardware buffer" );
-+//			common->Error( "idSoundSample_OpenAL::CreateOpenALBuffer: error loading data into OpenAL hardware buffer" );
- 		}
- 	}
- }
-@@ -585,7 +585,7 @@ void idSoundSample_OpenAL::MakeDefault()
- 
- 	if( CheckALErrors() != AL_NO_ERROR )
- 	{
--		common->Error( "idSoundSample_OpenAL::MakeDefault: error generating OpenAL hardware buffer" );
-+		// common->Error( "idSoundSample_OpenAL::MakeDefault: error generating OpenAL hardware buffer" );
- 	}
- 
- 	if( alIsBuffer( openalBuffer ) )
-@@ -594,7 +594,7 @@ void idSoundSample_OpenAL::MakeDefault()
- 		alBufferData( openalBuffer, GetOpenALBufferFormat(), defaultBuffer, totalBufferSize, format.basic.samplesPerSec );
- 		if( CheckALErrors() != AL_NO_ERROR )
- 		{
--			common->Error( "idSoundSample_OpenAL::MakeDefault: error loading data into OpenAL hardware buffer" );
-+			// common->Error( "idSoundSample_OpenAL::MakeDefault: error loading data into OpenAL hardware buffer" );
- 		}
- 	}
- }
-@@ -633,7 +633,7 @@ void idSoundSample_OpenAL::FreeData()
- 		alDeleteBuffers( 1, &openalBuffer );
- 		if( CheckALErrors() != AL_NO_ERROR )
- 		{
--			common->Error( "idSoundSample_OpenAL::FreeData: error unloading data from OpenAL hardware buffer" );
-+			// common->Error( "idSoundSample_OpenAL::FreeData: error unloading data from OpenAL hardware buffer" );
- 		}
- 		else
- 		{
++SET(OPENALDIR "/usr/local/opt/openal-soft")
++
+ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+ if(CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINOR_VERSION GREATER_EQUAL 6)
+@@ -1700,7 +1702,9 @@ else()
+ 			${SDL_INCLUDES} ${SDL_SOURCES})
+ 			
+ 		if(OPENAL)
+-			find_package(OpenAL REQUIRED)
++			# find_package(OpenAL REQUIRED)
++			SET(OPENAL_INCLUDE_DIR "/usr/local/opt/openal-soft/include")
++			SET(OPENAL_LIBRARY "/usr/local/opt/openal-soft/lib/libopenal.dylib")
+ 			add_definitions(-DUSE_OPENAL)
+    
+             # SRS - Added support for OpenAL Soft headers on OSX (vs default macOS SDK headers)
 -- 
 2.33.0
 
