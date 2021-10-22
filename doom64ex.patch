@@ -1,0 +1,38 @@
+From df2131f5fbe2b68d739f4e9c00234fba3306a50d Mon Sep 17 00:00:00 2001
+From: Eli Bradley <elibradley@utexas.edu>
+Date: Fri, 22 Oct 2021 13:00:35 -0500
+Subject: [PATCH] Fix
+
+---
+ .gitignore     | 2 ++
+ CMakeLists.txt | 4 +++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/.gitignore b/.gitignore
+index f8771b1..214fc3d 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -16,3 +16,5 @@
+ # conan
+ conanbuildinfo.cmake
+ conaninfo.txt
++
++.DS_Store
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 31d1b98..446326e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -113,7 +113,9 @@ if (NOT USE_CONAN)
+   find_package(ZLIB REQUIRED)
+ 
+   # libpng
+-  find_package(PNG REQUIRED)
++  # find_package(PNG REQUIRED)
++  SET(PNG_INCLUDE_DIR "/usr/local/opt/libpng/include")
++  SET(PNG_LIBRARIES "/usr/local/opt/libpng/lib/libpng.dylib" "libz.dylib")
+ 
+   # FluidSynth
+   if (ENABLE_SYSTEM_FLUIDSYNTH)
+-- 
+2.33.0
+
