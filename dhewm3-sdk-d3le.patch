@@ -1,0 +1,46 @@
+From 222f6ca59653cab0460446c22ed3041a7107784d Mon Sep 17 00:00:00 2001
+From: Eli Bradley <elibradley@utexas.edu>
+Date: Thu, 21 Oct 2021 23:09:58 -0500
+Subject: [PATCH] Fix
+
+---
+ .gitignore     | 3 +++
+ CMakeLists.txt | 6 ++++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index 0ec9e7f..30aecb3 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1 +1,4 @@
+ /build*
++
++.DS_Store
++
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 98aa02c..3d1f37e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,6 +1,8 @@
+ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+ project(dhewm3sdk)
+ 
++SET(CMAKE_CXX_FLAGS "-stdlib=libc++")
++
+ option(BASE		"Build the base (game/) game code" OFF)
+ set(BASE_NAME	"base" CACHE STRING "Name of the mod built from game/ (will result in \${BASE_NAME}.dll)")
+ set(BASE_DEFS	"GAME_DLL" CACHE STRING "Compiler definitions for the mod built from game/")
+@@ -181,8 +183,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
+ 		add_definitions(-DMACOS_X=1)
+ 
+ 		if(cpu STREQUAL "x86_64")
+-			add_compile_options(-arch x86_64 -mmacosx-version-min=10.6)
+-			set(ldflags "${ldflags} -arch x86_64 -mmacosx-version-min=10.6")
++			add_compile_options(-arch x86_64 -mmacosx-version-min=11.0)
++			set(ldflags "${ldflags} -arch x86_64 -mmacosx-version-min=11.0")
+ 		elseif(cpu STREQUAL "arm64")
+ 			add_compile_options(-arch arm64 -mmacosx-version-min=11.0)
+ 			set(ldflags "${ldflags} -arch arm64 -mmacosx-version-min=11.0")
+-- 
+2.33.0
+
