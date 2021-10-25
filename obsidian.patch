@@ -1,0 +1,179 @@
+From 38fb50d41df0b92b9fab69530038162953f7c801 Mon Sep 17 00:00:00 2001
+From: Eli Bradley <elibradley@utexas.edu>
+Date: Sun, 24 Oct 2021 20:54:05 -0500
+Subject: [PATCH 1/2] Fixes for macOS
+
+---
+ CMakeLists.txt                                 | 6 +++++-
+ source_files/ff_src/lex.yy.c                   | 1 +
+ source_files/obsidian_src/csg_doom.cc          | 2 +-
+ source_files/obsidian_src/main.cc              | 3 ++-
+ source_files/obsidian_src/main.h               | 8 ++++++++
+ source_files/obsidian_src/q_vis.cc             | 2 +-
+ source_files/physfs_src/physfs_platform_unix.c | 2 ++
+ source_files/zlib_src/gzguts.h                 | 2 ++
+ 8 files changed, 22 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 897e0e846..20a1ca5d7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,5 +1,7 @@
+ cmake_minimum_required(VERSION 3.12..3.20)
+ 
++project(Obsidian)
++
+ include(cmake/CPM.cmake)
+ 
+ add_subdirectory(source_files/lua_src)
+@@ -12,6 +14,8 @@ add_subdirectory(source_files/slump_src)
+ add_subdirectory(source_files/zlib_src)
+ add_subdirectory(source_files/fmt_src)
+ 
++find_package(Fontconfig)
++
+ project(
+   obsidian
+   LANGUAGES CXX
+@@ -237,7 +241,7 @@ if(UNIX)
+             obsidian_acc
+             obsidian_zdbsp
+             obsidian_slump
+-            fontconfig
++    PUBLIC  ${FONTCONFIG_LIBRARIES}
+   )
+ else()
+   target_link_libraries(
+diff --git a/source_files/ff_src/lex.yy.c b/source_files/ff_src/lex.yy.c
+index 38916988c..31ea418c9 100644
+--- a/source_files/ff_src/lex.yy.c
++++ b/source_files/ff_src/lex.yy.c
+@@ -20,6 +20,7 @@
+ #include <string.h>
+ #include <errno.h>
+ #include <stdlib.h>
++#include <unistd.h>
+ 
+ /* end standard C headers. */
+ 
+diff --git a/source_files/obsidian_src/csg_doom.cc b/source_files/obsidian_src/csg_doom.cc
+index 92c14a2c4..82222e00d 100644
+--- a/source_files/obsidian_src/csg_doom.cc
++++ b/source_files/obsidian_src/csg_doom.cc
+@@ -2715,7 +2715,7 @@ static void WriteFraggleScript() {
+                 continue;
+             }
+ 
+-            HeaderPrintf("  spawn(%s, %d, %d, %d, %d);\n", thing.fs_name,
++            HeaderPrintf("  spawn(%s, %d, %d, %d, %d);\n", thing.fs_name.c_str(),
+                          thing.x, thing.y, thing.angle, thing.z);
+         }
+ 
+diff --git a/source_files/obsidian_src/main.cc b/source_files/obsidian_src/main.cc
+index ecd2c11c5..81cf19e55 100644
+--- a/source_files/obsidian_src/main.cc
++++ b/source_files/obsidian_src/main.cc
+@@ -21,6 +21,7 @@
+ #include "main.h"
+ #include "fmt/core.h"
+ #include "images.h"
++#include <array>
+ 
+ #include "csg_main.h"
+ #include "g_nukem.h"
+@@ -258,7 +259,7 @@ void Determine_InstallDir(const char *argv0) {
+     install_dir = home_dir;
+ 
+ #else
+-    constexpr std::array prefixes = {
++    std::array<const char*, 3> prefixes = {
+         "/usr/local",
+         "/usr",
+         "/opt",
+diff --git a/source_files/obsidian_src/main.h b/source_files/obsidian_src/main.h
+index 1727d86e2..0ee7170ed 100644
+--- a/source_files/obsidian_src/main.h
++++ b/source_files/obsidian_src/main.h
+@@ -21,6 +21,14 @@
+ #ifndef __OBLIGE_MAIN_H__
+ #define __OBLIGE_MAIN_H__
+ 
++#include <locale.h>
++
++namespace std {
++inline const char *setlocale(int a, const char* b) {
++return ::setlocale(a, b);
++}
++}
++
+ #include <cstddef>
+ #include <fmt/format.h>
+ #include <fmt/ostream.h>
+diff --git a/source_files/obsidian_src/q_vis.cc b/source_files/obsidian_src/q_vis.cc
+index 033f5b7ab..2117a6dbb 100644
+--- a/source_files/obsidian_src/q_vis.cc
++++ b/source_files/obsidian_src/q_vis.cc
+@@ -569,7 +569,7 @@ static int v_row_bits;  // number of leafs or clusters
+ static int v_bytes_per_row;
+ 
+ // statistic stuff
+-typedef struct {
++typedef struct vis_statistics_t {
+     int uncompressed;
+     int compressed;
+ 
+diff --git a/source_files/physfs_src/physfs_platform_unix.c b/source_files/physfs_src/physfs_platform_unix.c
+index 9a8b58611..df522bb62 100644
+--- a/source_files/physfs_src/physfs_platform_unix.c
++++ b/source_files/physfs_src/physfs_platform_unix.c
+@@ -9,6 +9,8 @@
+ #define __PHYSICSFS_INTERNAL__
+ #include "physfs_platforms.h"
+ 
++#define PHYSFS_PLATFORM_UNIX 1
++
+ #ifdef PHYSFS_PLATFORM_UNIX
+ 
+ #include <ctype.h>
+diff --git a/source_files/zlib_src/gzguts.h b/source_files/zlib_src/gzguts.h
+index dd89d8975..94dc61b6c 100644
+--- a/source_files/zlib_src/gzguts.h
++++ b/source_files/zlib_src/gzguts.h
+@@ -3,6 +3,8 @@
+  * For conditions of distribution and use, see copyright notice in zlib.h
+  */
+ 
++#include <unistd.h>
++
+ #ifdef _LARGEFILE64_SOURCE
+ #ifndef _LARGEFILE_SOURCE
+ #define _LARGEFILE_SOURCE 1
+-- 
+2.33.1
+
+
+From 618ba9469f0bbeb53edc514083a68437081c906e Mon Sep 17 00:00:00 2001
+From: Eli Bradley <elibradley@utexas.edu>
+Date: Sun, 24 Oct 2021 20:58:15 -0500
+Subject: [PATCH 2/2] Update Gitignore
+
+---
+ .gitignore | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/.gitignore b/.gitignore
+index ce5f2532e..f57c495b6 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -41,3 +41,8 @@ web/out
+ web/shots
+ 
+ _work
++
++quake_tex.wd2
++qsavetex_log.txt
++PAK0.PAK
++PAK1.PAK
+-- 
+2.33.1
+
