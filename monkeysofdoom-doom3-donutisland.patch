@@ -1,0 +1,15 @@
+diff --git a/Users/ethertyper/Downloads/donutisland/script/entity_physics.script b/Users/ethertyper/Downloads/donutisland-modified/script/entity_physics.script
+index 9122662..86dd6d2 100644
+--- a/Users/ethertyper/Downloads/donutisland/script/entity_physics.script
++++ b/Users/ethertyper/Downloads/donutisland-modified/script/entity_physics.script
+@@ -9,6 +9,6 @@ Useful scripts related to water
+ 
+ 
+ // gets mass of a body for an entity
+-scriptEvent float getMass( float body );
++// scriptEvent float getMass( float body );
+ // returns 1 if the entity is in or touching a liquid
+-scriptEvent float isInLiquid();
+\ No newline at end of file
++// scriptEvent float isInLiquid();
+\ No newline at end of file
